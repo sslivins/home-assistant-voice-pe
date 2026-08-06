@@ -2088,16 +2088,14 @@ micro_wake_word:
     gain_factor: 4
   stop_after_detection: false
   models:
-    # PERSONAL VARIANT: alexa-only start wake word (microWakeWord v2.1).
-    # The stock start words (okay_nabu / hey_jarvis / hey_mycroft) were
-    # removed on purpose. "stop" stays — it's the reliable barge-in/interrupt
-    # word, armed only while the assistant is replying (see on_phase below).
-    # FIX (sslivins fork, 2026-08): the old kahrendt v2.1_models/alexa.json
-    # release asset 404s after kahrendt reorganized releases (~2026-07-08).
-    # Repointed to the canonical, stable esphome-hosted model manifest, which
-    # has hosted the v2 models since 2024-07 and is what ESPHome shorthand uses.
-    - model: https://github.com/esphome/micro-wake-word-models/raw/main/models/v2/alexa.json
-      id: alexa
+    # sslivins fork: single start wake word = "Hey Jarvis" (changed from the
+    # upstream author's "alexa", which collides with real Amazon Echo devices).
+    # "stop" stays — the reliable barge-in/interrupt word, armed only while the
+    # assistant is replying (see on_phase below).
+    # Model is pulled from the canonical, stable esphome-hosted manifest (the
+    # upstream kahrendt release URL 404'd after a ~2026-07-08 release reorg).
+    - model: https://github.com/esphome/micro-wake-word-models/raw/main/models/v2/hey_jarvis.json
+      id: hey_jarvis
     - model: https://github.com/kahrendt/microWakeWord/releases/download/stop/stop.json
       id: stop
       internal: true
@@ -2126,7 +2124,7 @@ micro_wake_word:
   # 'Stop', but VAD model doesn't" 3x in a row before finally accepting
   # (+1.5 s latency, long enough for OpenAI to win the turn race during the
   # follow-up window). Keep the gate (it still blocks non-speech noise
-  # triggers for "alexa") but make it easier to satisfy.
+  # triggers for "hey jarvis") but make it easier to satisfy.
   vad:
     probability_cutoff: 0.3
   on_wake_word_detected:
@@ -2323,17 +2321,17 @@ select:
       # Sets specific wake word probabilities computed for each particular model
       # Note probability cutoffs are set as a quantized uint8 value, each comment has the corresponding floating point cutoff
       # False Accepts per Hour values are tested against all units and channels from the Dinner Party Corpus.
-      # PERSONAL VARIANT: only the alexa@v2.1 model is built in now, so the
+      # sslivins fork: only the hey_jarvis model is built in now, so the
       # three tiers just adjust its cutoff. Cutoffs are quantized uint8
       # (round(probability * 255)); LOWER = more sensitive = more false
       # accepts. Spacing mirrors the proven okay_nabu tiers.
       lambda: |-
         if (x == "Slightly sensitive") {
-          id(alexa).set_probability_cutoff(217);   // ~0.85
+          id(hey_jarvis).set_probability_cutoff(217);   // ~0.85
         } else if (x == "Moderately sensitive") {
-          id(alexa).set_probability_cutoff(178);   // ~0.70
+          id(hey_jarvis).set_probability_cutoff(178);   // ~0.70
         } else if (x == "Very sensitive") {
-          id(alexa).set_probability_cutoff(140);   // ~0.55
+          id(hey_jarvis).set_probability_cutoff(140);   // ~0.55
         }
 
 
