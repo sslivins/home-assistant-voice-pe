@@ -2092,8 +2092,11 @@ micro_wake_word:
     # The stock start words (okay_nabu / hey_jarvis / hey_mycroft) were
     # removed on purpose. "stop" stays — it's the reliable barge-in/interrupt
     # word, armed only while the assistant is replying (see on_phase below).
-    # kahrendt/microWakeWord redirects to the OHF-Voice org automatically.
-    - model: https://github.com/kahrendt/microWakeWord/releases/download/v2.1_models/alexa.json
+    # FIX (sslivins fork, 2026-08): the old kahrendt v2.1_models/alexa.json
+    # release asset 404s after kahrendt reorganized releases (~2026-07-08).
+    # Repointed to the canonical, stable esphome-hosted model manifest, which
+    # has hosted the v2 models since 2024-07 and is what ESPHome shorthand uses.
+    - model: https://github.com/esphome/micro-wake-word-models/raw/main/models/v2/alexa.json
       id: alexa
     - model: https://github.com/kahrendt/microWakeWord/releases/download/stop/stop.json
       id: stop
